@@ -13,7 +13,7 @@ public class MultiQueue implements Hades{
 
     private int empty = 0;
 
-    
+    private LinkedList<String> events = new LinkedList<String>();    
 
     public MultiQueue(){
         for (int i = 0; i < queues.length; i++) {
@@ -36,6 +36,7 @@ public class MultiQueue implements Hades{
                 }
             }
             queues[shortest].add(tachyon);
+	    events.add("Customer #"+ (count - 1)+" joined the queue #"+shortest);
         }
     }
 
@@ -43,8 +44,10 @@ public class MultiQueue implements Hades{
         //TODO: add customers from queue if server empty
         for (int i = 0; i < servers.length; i ++){
             if (servers[i] == null){
-                if (!queues[i].isEmpty())
+                if (!queues[i].isEmpty()){
                     servers[i] = queues[i].remove();
+		    events.add("Customer " + servers[i].ID+" has joined server #"+i);
+		}
                 else
                     empty ++;
             }
@@ -57,6 +60,7 @@ public class MultiQueue implements Hades{
             if (servers[i] != null){
                 servers[i].serviceTime--;
                 if (servers[i].serviceTime == 0){
+		    events.add("Customer "+servers[i].ID+" left server #"+i);
                     servers[i] = null;
                 }
             }
@@ -64,10 +68,17 @@ public class MultiQueue implements Hades{
     }
 
     public String toString(){
-        String output = "";
+        StringBuilder output = new StringBuilder();
 
-        output += "Time: " + tick + "\n";
-        output += "Customer #" + count; 
+        output.append("Time: ")
+	output.append(tick);
+	output.append("\n");
+
+	for (String s : events){
+	   output.append(s);  
+	}
+	events.clear();
+	 
 
         return output;
     }
