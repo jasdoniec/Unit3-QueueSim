@@ -4,10 +4,13 @@ public class Simulation {
 
     private final int SIMULATION_MINUTES = 480;
 
-    private Hades queue;
+    private Hades[] queues = new Hades[2];
 
-    public Simulation(Hades type){
-        queue = type;
+    private int count = 1;
+
+    public Simulation(){
+        queues[0] = new MultiQueue();
+        queues[1] = new SingleQueue();
     }
 
     public void run() {
@@ -27,22 +30,37 @@ public class Simulation {
     }
 
     private void processDepartures(int tick) {
-        queue.processDepartures(tick);
+        queues[0].processDepartures(tick);
+        queues[1].processDepartures(tick);
     }
 
     private void processArrivals(int tick) {
-        queue.newCustomers(tick);
+
+        if (Math.random() < SimulationVars.ARRIVAL_CHANCE) {
+            int time = (int)(Math.random()*(SimulationVars.MAX_TIME-SimulationVars.MIN_TIME+1)+SimulationVars.MIN_TIME);
+
+            Customer tachyon = new Customer(tick, "C" + count, time);
+            Customer cafe = new Customer(tick, "C" + count, time);
+
+            count ++;
+
+            queues[0].newCustomers(tachyon);
+            queues[1].newCustomers(cafe);
+        }
     }
 
     private void dispatchCustomers(int tick) {
-        queue.dispatchCustomers();
+        queues[0].dispatchCustomers();
+        queues[1].dispatchCustomers();
     }
 
     private void printState(int tick) {
-        
+        System.out.println(queues[0]);
+        System.out.println(queues[1]);
     }
 
     private void printSummaryStats() {
-
+        System.out.println(queues[0].finalSumm());
+        System.out.println(queues[1].finalSumm());
     }
 }
