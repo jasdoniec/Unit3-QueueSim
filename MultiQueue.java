@@ -8,8 +8,6 @@ public class MultiQueue implements Hades{
 
     private Customer[] servers = new Customer[SimulationVars.NUM_SERVERS];
 
-    private int count = 1;
-
     private int tick = 0;
 
     private int empty = 0;
@@ -38,7 +36,6 @@ public class MultiQueue implements Hades{
     public void newCustomers(Customer customer) {
         
         
-            count++;
             //TODO: Add customer to the shortes queue in queues
             int shortest = 0;
             int longest = 0;
@@ -150,12 +147,19 @@ public class MultiQueue implements Hades{
         output.append("\nServer Utilization: ");
         output.append((480*servers.length-empty)/(servers.length*480.0)*100);
         output.append("%\nCustomers Remaining: ");
-        output.append(count-1-cusCount);
+        
+        int remaining = 0;
+        for (Queue<Customer> q : queues) remaining += q.size();
+        for (Customer c : servers) if (c != null) remaining++;
+        output.append(remaining);
         
         return output.toString();
     }
     
     private float[] getAvgAndMaxTime(){
+        if (waitTimes.isEmpty()) {
+            return new float[] {0f, 0f};
+        }
         float[] output = new float[2];
 
         int max = waitTimes.get(0);
